@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="Generator" content="EditPlus®">
+  <meta name="Author" content="">
+  <meta name="Keywords" content="">
+  <meta name="Description" content="">
+  <title>贪吃蛇</title>
+ </head>
+	<style>
+	#game{margin:80px auto;border:1px solid #000;display:block;}
+	</style>
+ <body>
+	<canvas id="game" width="450" height="450"></canvas>
+	<audio id="music" src="1.mp3"></audio>
+	
+	<script src="js/jquery.js"></script>
+	<script>
+	var canvas=document.getElementById("game");
+	var cxt=canvas.getContext("2d");
+	var width=15;
+
+	function Cell(x,y,f){
+		this.x=x;
+		this.y=y;
+		this.f=f;
+	}
+	function Food(x,y){
+		this.x=x;
+		this.y=y;
+	}
+	var snake=[];
+	var length=6;
+	var speed=100;
+	var food=new Food(15,15);
+	var oldSnake=[];
+	for(var i=0;i<length;i++)
+	{	snake[i]=new Cell(i,0,1);
+	}
+	for(var i=0;i<length;i++)
+	{	oldSnake[i]=new Cell(i,0,1);
+	}
+	draw();
+
+	document.onkeydown=function(e){
+		var direction=0;
+		switch(e.keyCode)
+		{	case 38:direction=2;break;// 上
+			case 40:direction=-2;break;// 下
+			case 37:direction=-1;break;// 左
+			case 39:direction=1;break;// 右
+		}
+		if(direction!=0&&snake[snake.length-1].f+direction!=0)
+			moveSnake(direction);
+	}
+	function moveSnake(direction){
+		for(var i=0;i<snake.length;i++)
+		{	oldSnake[i]=snake[i];
+		}
+		var head=snake[snake.length-1];
+		if(!direction)
+			direction=head.f;
+		var newHead=new Cell(head.x,head.y,head.f);
+		var newSnake=[];
+		newHead.f=direction;
+		for(i=1;i<snake.length;i++)
+		{	newSnake[i-1]=snake[i];
+		}
+		switch (newHead.f)
+		{
+		case 2:newHead.y--;break;
+		case -2:newHead.y++;break;
+		case -1:newHead.x--;break;
+		case 1:newHead.x++;break;
+		}
+		newSnake[snake.length-1]=newHead;
+		snake=newSnake;
+		draw();
+		
+	}
+
+	function draw(){
+	var head=snake[snake.length-1];
+	cxt.clearRect(0,0,450,450);
+	cxt.fillStyle="#000033";
+	cxt.beginPath();
+	cxt.rect(food.x*15,food.y*15,15,15);
+	cxt.closePath();
+	cxt.fill();
+	
+	if(head.x==food.x&&head.y==food.y)
+	{	var newHead=new Cell(head.x,head.y,head.f);
+		
+		snake=oldSnake;
+		snake[snake.length]=newHead;
+		randFood();
+	}
+
+	for(var i=0;i<snake.length;i++)
+	{	var cell=snake[i];
+		cxt.fillStyle="#33ff33";
+		if(i==snake.length-1)
+			cxt.fillStyle="#ff0033";
+		cxt.beginPath();
+		cxt.rect(cell.x*15,cell.y*15,15,15);
+		cxt.closePath();
+		cxt.fill();
+	}
+	gameover();
+	}
+	function randFood(){
+		food.x=Math.ceil(Math.random()*28)+1;
+		food.y=Math.ceil(Math.random()*28)+1;
+		for(var i=0;i<snake.length;i++)
+		{	if(food.x==snake[i].x&&food.y==snake[i].y)
+			{	randFood();
+			}
+		}
+	}
+	function gameover(){
+	var head=snake[snake.length-1];
+		if(head.x>=30||head.y>=30||head.x<0||head.y<0)
+		{	alert("撞墙了！");
+			window.location.reload();
+		}
+		for(var i=0;i<snake.length-1;i++)
+		{	if(head.x==snake[i].x&&head.y==snake[i].y)
+			{	alert("怎么咬到自己了？？？？");
+				window.location.reload();
+			}
+		}
+	}
+	setInterval(moveSnake,speed);
+	</script>
+ </body>
+</html>

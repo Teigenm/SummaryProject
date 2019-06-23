@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+<title>3D Sierpinski Gasket</title>
+
+    <style type="text/css">
+        .container{width:600px;height:400px;margin:60px auto;}
+        .first{margin:20px 0px;}
+        .first_2{width:200px;float:right;}
+        .btn{
+            font-size:12px;
+            cursor:pointer;
+        }
+    </style>
+<script id="vertex-shader" type="x-shader/x-vertex">
+attribute vec3 vPosition;
+attribute vec3 vColor;
+varying vec4 color;
+
+void
+main()
+{
+    gl_Position = vec4(vPosition, 1.0);
+    color = vec4(vColor, 1.0);
+}
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+precision mediump float;
+   
+varying vec4 color;
+
+void
+main()
+{
+    gl_FragColor = color;
+}
+</script>
+
+<script type="text/javascript" src="../Common/webgl-utils.js"></script>
+<script type="text/javascript" src="../Common/initShaders.js"></script>
+<script type="text/javascript" src="../Common/MV.js"></script>
+<script type="text/javascript" src="gasket4.js"></script>
+</head>   
+
+<body>
+    <div class="container">
+        <canvas id="gl-canvas" width="600" height="600"></canvas>
+    <div class="first">
+        <div class="first_2">
+            <input class="btn" type="button" value="开始" onclick="start()"/>
+            <input class="btn" type="button" value="暂停" onclick="pause()"/>
+            <input class="btn" type="button" value="终止" onclick="exit()"/>
+        </div>
+    </div>
+</body>
+</html>

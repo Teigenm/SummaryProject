@@ -1,0 +1,127 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>人脸登录系统</title>
+<style type="text/css">
+    *{padding:0px;margin:0px;}
+	html,body{width:100%;height:100%;}
+    body{background: url("image/bg.jpg");}
+    h1{text-align:center;margin-top:15px;}
+    #msg{text-align:center;margin-top:10px;}
+    .container{width:534px;height:30px;margin:10px auto 0px;}
+    .label_user{font-size:18px;text-align:right;font-weight:normal;}
+    #user_id{height:20px;width:200px;float:left;}
+    .media{width:534px;height:400px;margin:10px auto 0px;position:relative;overflow:hidden;}
+    #canvas{display:none;}
+    #scan{
+    	position:absolute;
+    	width:100%;
+    	height:100%;
+    	background:url(image/scan.png);
+    	background-size:cover;
+    }
+    .btn_group{
+    	width:534px;
+    	height:40px;
+    	margin:20px auto 0px;
+    }
+    #btn_login{
+    	width:150px;
+    	height:40px;
+    	text-align:center;
+    	line-height:40px;
+    	margin-left:85px;
+    	background:red;
+    	color:#fff;
+    	box-shadow:1px 1px 5px #B6B6B6;
+    	border:none;cursor:pointer;
+    	border-radius:20px;
+    }
+    #btn_register{
+    	width:150px;
+    	height:40px;
+    	text-align:center;
+    	line-height:40px;
+    	margin-left:40px;
+    	background:red;
+    	cursor:pointer;
+    	color:#fff;
+    	box-shadow:1px 1px 5px #B6B6B6;
+    	border:none;
+    	border-radius:20px;
+    }
+</style>
+</head>
+<body>
+    <h1>登录系统</h1>
+    <h3 id="msg">&nbsp;</h3>
+   	<table class="container">
+   		<tr>
+   			<th class="label_user" width=35%>账号：</th>
+   			<th width=65%><input type="text" id="user_id"/></th>
+   		</tr>
+   	</table>
+    <div class="media">
+        <video src="" width="534" height="400" id="video" autoplay></video>
+        <canvas width="534" height="400" id="canvas"></canvas>
+        <div id="scan"></div>
+    </div>
+    <div class="btn_group">
+    	<input type="button" id="btn_login" value="登录">
+    	<input type="button" id="btn_register" value="注册">
+    </div>
+<script type="text/javascript" src="js/jquery-1.10.2.js"></script>
+<script type="text/javascript">
+    var video = document.getElementById("video");
+    var canvas = document.getElementById("canvas");
+    var context = canvas.getContext("2d");
+    var btn_login = document.getElementById("btn_login");
+    var btn_register = document.getElementById("btn_register");
+
+    var getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
+    getUserMedia.call(navigator,{video:true,audio:false},function (localMediaStream) {
+        video.srcObject=localMediaStream;
+    },function (exception) {
+        console.log("获取摄像头失败！",exception);
+    });
+
+    function login(){
+    	var userId=$("#user_id").val();
+        if(userId==""||userId==null){
+        	alert("请输入账号");
+        	return;
+        }
+    	scan();
+        context.drawImage(video,0,0,534,400);
+        var imgSrc = canvas.toDataURL("image/png");
+        var base64 = imgSrc.split("base64")[1];
+        base64 = base64.substring(1,base64.length);
+       	$.ajax({
+       		url:"UserServlet",
+       		type:"post",
+       		data:{"userId":userId,"facePass":base64,"op":"login"},
+       		success:function(result){
+       			$("#msg").html(result);
+       			if(result.match("成功")){
+       				console.log(1);
+       				window.location.href="http://www.baidu.com";
+       			}
+       		}
+       	});
+    }
+    btn_login.onclick = function () {
+        login();
+    }
+    btn_register.onclick = function () {
+		window.location.replace("./register.html");
+    }
+    function scan(){
+    	var box = $(".media");
+    	$("#scan").css({"bottom":box.height()}).animate({bottom:0},2000,function(){
+    		$(this).css({"bottom":box.height()})
+    	});
+    }
+</script>
+</body>
+</html>
